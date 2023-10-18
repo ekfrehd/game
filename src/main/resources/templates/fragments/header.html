@@ -58,14 +58,58 @@
                            sec:authorize="!isAuthenticated()">
                             <span class="icon_profile"></span></a>
                         <!-- 로그인 되었을 때만 로그아웃 링크 표시 -->
-                        <a class="nav-link" th:href="@{/members/logout}"
-                           sec:authorize="isAuthenticated()">Logout</a>
-                    </div>
+                        <div class="slicknav_btn_wrapper" sec:authorize="isAuthenticated()">
+                            <a href="members/loginInfo" class="slicknav_btn" aria-haspopup="true" role="button" tabindex="0">
+                                <span class="icon_profile"></span>
+                                <span class="slicknav_menutxt">My Page</span>
+                            </a>
+                            <a class="nav-link" th:href="@{/members/logout}">
+                                <span class="slicknav_icon"></span>
+                                <span class="slicknav_menutxt">Logout</span>
+                            </a>
+                        </div>
+                    </a>
                 </div>
             </div>
-            <div id="mobile-menu-wrap"></div>
+            <div id="mobile-menu-wrap">
+            <div class="slicknav_menu"><a href="members/loginInfo" aria-haspopup="true" role="button" tabindex="0"
+                                          class="slicknav_btn slicknav_collapsed" style="outline: none;"><span
+                    class="slicknav_menutxt">MENU</span><span class="slicknav_icon"><span
+                    class="slicknav_icon-bar"></span><span class="slicknav_icon-bar"></span><span
+                    class="slicknav_icon-bar"></span></span></a><!--마이페이지 버튼-->
+                <nav class="slicknav_nav slicknav_hidden" aria-hidden="true" role="menu" style="display: none;">
+                    <ul>
+                        <li class="active"><a href="./index.html" role="menuitem">Homepage</a></li>
+                        <li class="slicknav_collapsed slicknav_parent"><a href="#" role="menuitem"
+                                                                          aria-haspopup="true" tabindex="-1"
+                                                                          class="slicknav_item slicknav_row"
+                                                                          style="outline: none;"><a
+                                href="./categories.html">Categories <span class="arrow_carrot-down"></span></a>
+                            <span class="slicknav_arrow">►</span></a>
+                            <ul class="dropdown slicknav_hidden" role="menu" aria-hidden="true"
+                                style="display: none;">
+                                <li><a href="./categories.html" role="menuitem" tabindex="-1">Categories</a></li>
+                                <li><a href="./anime-details.html" role="menuitem" tabindex="-1">Anime Details</a>
+                                </li>
+                                <li><a href="./anime-watching.html" role="menuitem" tabindex="-1">Anime Watching</a>
+                                </li>
+                                <li><a href="./blog-details.html" role="menuitem" tabindex="-1">Blog Details</a>
+                                </li>
+                                <li><a href="./signup.html" role="menuitem" tabindex="-1">Sign Up</a></li>
+                                <li><a href="./login.html" role="menuitem" tabindex="-1">Login</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="./blog.html" role="menuitem">Our Blog</a></li>
+                        <li><a href="#" role="menuitem">Contacts</a></li>
+                    </ul>
+                </nav>
+            </div>
         </div>
+            </div>
+        </div>
+
     </header>
+
     <!-- Header End -->
 
 </div>

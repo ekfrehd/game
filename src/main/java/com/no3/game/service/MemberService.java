@@ -1,9 +1,13 @@
 package com.no3.game.service;
 
+import com.no3.game.entity.Cart;
 import com.no3.game.entity.Member;
-import com.no3.game.repository.MemberRepository;
+import com.no3.game.entity.Order;
+import com.no3.game.entity.Review;
+import com.no3.game.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
@@ -22,6 +26,13 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class MemberService implements UserDetailsService {
     private final MemberRepository memberRepository;
+    private final CartRepository cartRepository;
+    private final CartItemRepository cartItemRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    private final ReviewRepository reviewRepository;
+
+    private final OrderRepository orderRepository;
 
     public Member saveMember(Member member){
         validateDuplicateMember(member);
@@ -73,6 +84,43 @@ public class MemberService implements UserDetailsService {
         } else {
             throw new IllegalArgumentException("Unsupported principal type");
             // 어떤 타입에도 속하지 않을 때 예외 발생(예상치 못한 타입의 'Principal' 객체가 주어졌을 때 문제 발견을 위한 목적)
+        }
+    }
+    public boolean deleteMember(String email, String password) {
+        // 회원 탈퇴
+
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("이메일이 존재하지 않습니다."));
+
+        Long cartId;
+        Cart cart = cartRepository.findByMemberId(member.getId());
+
+        if (cart != null) {
+            cartId = cart.getId();
+            cartItemRepository.deleteByCartId(cartId);
+            cartRepository.deleteCartById(cartId);
+        }
+
+        // Remove the member from orders
+        Order order = orderRepository.findByMemberId(member.getId());
+
+        if (order != null) {
+            order.setMember(null);
+        }
+
+        // Delete review by member
+        Review review = reviewRepository.findByMemberId(member.getId());
+
+        if (review != null) {
+            reviewRepository.deleteReviewByMember(member);
+        }
+
+        // Check the password and delete the member
+        if (passwordEncoder.matches(password, member.getPassword())) {
+            memberRepository.delete(member);
+            return true;
+        } else {
+            return false;
         }
     }
 

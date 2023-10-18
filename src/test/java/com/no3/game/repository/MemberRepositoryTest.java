@@ -5,6 +5,7 @@ import com.no3.game.entity.Member;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.annotation.Commit;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,15 +21,18 @@ public class MemberRepositoryTest {
     @Autowired
     private ReviewRepository reviewRepository;
 
+    @Autowired
+    PasswordEncoder passwordEncoder;
+
     @Test
     public void insertMembers() {
 
         IntStream.rangeClosed(1,5).forEach(i -> {
             Member member = Member.builder()
-                    .email("a"+i +"@naver.com")
-                    .password("1234")
+                    .email("aa"+i+5 +"@naver.com")
+                    .password(passwordEncoder.encode("12341234"))
                     .name("test"+i)
-                    .role(Role.USER)
+                    .role(Role.ADMIN)
                     .build();
             memberRepository.save(member);
         }); // USER insert test

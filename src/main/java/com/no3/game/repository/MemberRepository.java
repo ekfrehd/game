@@ -15,6 +15,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     // Member findByEmail(String email);
     // 중복된 회원이 있는지 검사하기 위해서 이메일로 회원을 검사할 수 있게 쿼리 메소드를 작성
 
+
     Optional<Member> findByEmail(@Param("email") String email);
 
     Member findByName(String name);
@@ -23,6 +24,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     @Transactional
     @Query("update Member m set m.password =:password where m.id = :id ")
     void updatePassword(@Param("password") String password, @Param("id") Long id); // 비밀번호 수정
+
+
 
 
 
