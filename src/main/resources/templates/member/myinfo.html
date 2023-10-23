@@ -110,72 +110,85 @@
                         </form>
                     </div>
                 </div>
+                <div class="col-lg-6">
+                    <div class="login__form">
+                        <h3>Cancle</h3> <!-- 회원 탈퇴 -->
+                        <div class="input__item">
+                            <form action="/members/delete" method="post">
+                                <div class="input__item">
+                                    <input type="password" name="password" id="password" placeholder="Password">
+                                    <span class="icon_lock"></span>
+                                </div>
+                                <button type="submit" class="site-btn">cancle</button>
+                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                            </form>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
     <!-- Signup Section End -->
 
-    <h3>Cancle</h3> <!-- 회원 탈퇴 -->
-    <div class="input__item">
-        <form action="/members/delete" method="post">
-            <div class="input__item">
-                <input type="password" name="password" id="password" placeholder="Password">
-                <span class="icon_lock"></span>
-            </div>
-            <button type="submit" class="site-btn">cancle</button>
-            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-        </form>
-    </div>
 
-    <!-- Blog Details Section Begin --> <!-- 구매내역 출력, 구매 취소 -->
-    <section class="blog-details spad">
-        <div th:each="order : ${orders.getContent()}">
-            <div th:each="orderItem : ${order.orderItemDtoList}" class="d-flex mb-3">
-                <div class="container">
-                    <div class="row d-flex justify-content-center">
-                        <div class="col-lg-8">
-                            <div class="blog__details__title">
-                                <h6 th:text="'Order Date : ' + ${order.orderDate}"></h6>
-                                <h2 th:text="${orderItem.itemNm}"></h2>
-                            </div>
-                        </div>
-                        <div class="blog__details__tags"
-                             th:if="${order.orderStatus == T(com.no3.game.constant.OrderStatus).ORDER}">
-                            <a href="#" class="blog__details__tags" th:attr="data-orderid=${order.orderId}"
-                               onclick="cancelOrder(this.getAttribute('data-orderid'))">Cancel Order</a>
-                        </div>
-                        <div class="blog__details__tags"
-                             th:unless="${order.orderStatus == T(com.no3.game.constant.OrderStatus).ORDER}">
-                            <a href="#">(Cancel complete)</a>
-                        </div>
-                        <div class="col-lg-12">
-                            <div class="blog__details__pic">
-                                <img th:src="${orderItem.imgUrl}" width=50px>
-                            </div>
-                        </div>
-                        <div class="col-lg-8">
-                            <div class="blog__details__content">
-                                <div class="blog__details__item__text">
-                                    <h4 data-th-text="|￦ ${#numbers.formatInteger(orderItem.orderPrice, 3, 'COMMA')}  |"></h4>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="container"> <!-- 페이징 처리 -->
-            <div class="row">
-                <div class="col-lg-6"
-                     th:with="start=${(orders.number/maxPage)*maxPage + 1}, end=(${(orders.totalPages == 0) ? 1 : (start + (maxPage - 1) < orders.totalPages ? start + (maxPage - 1) : orders.totalPages)})">
-                    <div class="product__pagination" th:each="page: ${#numbers.sequence(start, end)}"
-                         th:classappend="${orders.number eq page-1}?'active':''">
-                        <a th:href="@{'/members/loginInfo/' + ${page-1}}" th:inline="text">[[${page}]]</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+
+<!--    &lt;!&ndash; Blog Details Section Begin &ndash;&gt; &lt;!&ndash; 구매내역 출력, 구매 취소 &ndash;&gt;-->
+<!--    <section class="blog-details spad">-->
+<!--        <div th:each="order : ${orders.getContent()}">-->
+<!--            <div th:each="orderItem : ${order.orderItemDtoList}" class="d-flex mb-3">-->
+<!--                <div class="container">-->
+<!--                    <div class="row d-flex justify-content-center">-->
+<!--                        <div class="col-lg-8">-->
+<!--                            <div class="blog__details__title">-->
+<!--                                <h6 th:text="'Order Date : ' + ${order.orderDate}"></h6>-->
+<!--                                <h2 th:text="${orderItem.itemNm}"></h2>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                        <div class="blog__details__tags"-->
+<!--                             th:if="${order.orderStatus == T(com.no3.game.constant.OrderStatus).ORDER}">-->
+<!--                            <a href="#" class="blog__details__tags" th:attr="data-orderid=${order.orderId}"-->
+<!--                               onclick="cancelOrder(this.getAttribute('data-orderid'))">Cancel Order</a>-->
+<!--                        </div>-->
+<!--                        <div class="blog__details__tags"-->
+<!--                             th:unless="${order.orderStatus == T(com.no3.game.constant.OrderStatus).ORDER}">-->
+<!--                            <a href="#">(Cancel complete)</a>-->
+<!--                        </div>-->
+<!--                        <div class="col-lg-12">-->
+<!--                            <div class="blog__details__pic">-->
+<!--                                <img th:src="${orderItem.imgUrl}" width=50px>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                        <div class="col-lg-8">-->
+<!--                            <div class="blog__details__content">-->
+<!--                                <div class="blog__details__item__text">-->
+<!--                                    <h4 data-th-text="|￦ ${#numbers.formatInteger(orderItem.orderPrice, 3, 'COMMA')}  |"></h4>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+
+<!--            </div>-->
+<!--&lt;!&ndash;            <div class="col-lg-8">&ndash;&gt;-->
+<!--&lt;!&ndash;                <div class="blog__details__content">&ndash;&gt;-->
+<!--&lt;!&ndash;                    <div class="blog__details__item__text">&ndash;&gt;-->
+<!--&lt;!&ndash;                        <h4 data-th-text="|￦ ${#numbers.formatInteger(order.getTotalPrice(), 3, 'COMMA')}  |"></h4>&ndash;&gt;-->
+<!--&lt;!&ndash;                    </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                </div>&ndash;&gt;-->
+<!--&lt;!&ndash;            </div>&ndash;&gt;-->
+<!--        </div>-->
+<!--        <div class="container"> &lt;!&ndash; 페이징 처리 &ndash;&gt;-->
+<!--            <div class="row">-->
+<!--                <div class="col-lg-6"-->
+<!--                     th:with="start=${(orders.number/maxPage)*maxPage + 1}, end=(${(orders.totalPages == 0) ? 1 : (start + (maxPage - 1) < orders.totalPages ? start + (maxPage - 1) : orders.totalPages)})">-->
+<!--                    <div class="product__pagination" th:each="page: ${#numbers.sequence(start, end)}"-->
+<!--                         th:classappend="${orders.number eq page-1}?'active':''">-->
+<!--                        <a th:href="@{'/members/loginInfo/' + ${page-1}}" th:inline="text">[[${page}]]</a>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </section>-->
     <!-- Blog Details Section End -->
 </div>
 </html>

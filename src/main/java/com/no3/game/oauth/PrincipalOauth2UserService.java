@@ -32,6 +32,7 @@ public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
         // userRequest 정보 -> loadUser함수 호출 -> 구글로부터 회원 프로필을 받아준다.
 
         OAuth2User oAuth2User = super.loadUser(userRequest);
+
         OAuth2UserInfo oAuth2UserInfo = null;
         if (userRequest.getClientRegistration().getRegistrationId().equals("google")) {
             oAuth2UserInfo = new GoogleUserInfo(oAuth2User.getAttributes());

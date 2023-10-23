@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Sales Statistics</title>
+</head>
+<body>
+<h1>Sales Statistics</h1>
+<form th:action="@{/admin/sales}" method="post">
+  <label for="startDate">Start Date:</label>
+  <input type="date" id="startDate" name="startDate">
+  <label for="endDate">End Date:</label>
+  <input type="date" id="endDate" name="endDate">
+  <button type="submit">Generate Statistics</button>
+</form>
+
+<p th:if="${totalSales != null}">Total Sales for the selected period: <span th:text="${totalSales}"></span></p>
+</body>
+</html>

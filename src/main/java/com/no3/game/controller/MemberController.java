@@ -3,6 +3,7 @@ package com.no3.game.controller;
 import com.no3.game.dto.MemberJoinDto;
 import com.no3.game.dto.OrderHistDto;
 import com.no3.game.entity.Member;
+import com.no3.game.entity.Order;
 import com.no3.game.repository.MemberRepository;
 import com.no3.game.repository.OrderRepository;
 import com.no3.game.service.MemberService;
@@ -22,7 +23,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.math.BigDecimal;
 import java.security.Principal;
+import java.util.List;
 import java.util.Optional;
 
 @RequestMapping("/members")
@@ -65,34 +68,26 @@ public class MemberController {
 
     @GetMapping(value = "/login")
     public String loginMember() {
-        return "/member/memberLoginForm";
+        return "member/memberLoginForm";
     }
 
     @GetMapping(value = "/login/error")
     public String loginError(Model model) {
         model.addAttribute("loginErrorMsg", "아이디 또는 비밀번호를 확인해주세요");
-        return "/member/memberLoginForm";
+        return "member/memberLoginForm";
     }
 
 
     // 마이페이지
-    @GetMapping(value = {"/loginInfo", "/loginInfo/{page}"})
-    public String memberInfo(@PathVariable("page") Optional<Integer> page, Principal principal, Model model) {
-        String loginId = principal.getName();
-        Pageable pageable = PageRequest.of(page.isPresent() ? page.get() : 0, 2); // 한 페이지 당 2개의 구매 목록 출력
-        Page<OrderHistDto> ordersHistDtoList = orderService.getOrderList(loginId, pageable);
-
-        Optional<Member> optionalMember = memberRepository.findByEmail(loginId);
-
-        Member member = optionalMember.orElse(new Member());
+    @GetMapping(value = "/loginInfo")
+    public String memberInfo(Principal principal, Model model) {
+        Member member = memberService.getMemberFromPrincipal(principal);
 
         model.addAttribute("member", member);
-        model.addAttribute("orders", ordersHistDtoList);
-        model.addAttribute("page", pageable.getPageNumber());
-        model.addAttribute("maxPage", 10);
 
         return "member/myinfo";
     }
+
 
     // 회원 탈퇴
     @PostMapping("/delete")
@@ -102,7 +97,7 @@ public class MemberController {
         boolean result = memberService.deleteMember(userDetails.getUsername(), password);
 
         if (result) {
-            return "redirect:/members/logout";
+            return "redirect:members/logout";
         } else {
             model.addAttribute("wrongPassword", "비밀번호가 맞지 않습니다.");
             return "/members/delete";

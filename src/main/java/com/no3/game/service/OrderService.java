@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.thymeleaf.util.StringUtils;
 
 import javax.persistence.EntityNotFoundException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -119,6 +120,28 @@ public class OrderService {
 
         return order.getId();
     }
+
+    public int calculateTotalSales() {
+        List<Order> orders = orderRepository.findAll();
+        int totalSales = 0;
+        for (Order order : orders) {
+            totalSales += order.getTotalPrice();
+        }
+        return totalSales;
+    }
+
+    public double calculateTotalSales(LocalDateTime startDate, LocalDateTime endDate) {
+        List<Order> ordersInPeriod = orderRepository.findByOrderDateBetween(startDate, endDate);
+
+        double totalSales = 0;
+        for (Order order : ordersInPeriod) {
+            totalSales += order.getTotalPrice();
+        }
+
+        return totalSales;
+    }
+
+
 
 
 }

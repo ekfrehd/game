@@ -21,7 +21,7 @@ public class OrderItem extends BaseEntity {
     private Order order;
 
     private int orderPrice; // 아이템 단가
-    private int count; // 주문 수량
+    private int count ; // 주문 수량
 
     public static OrderItem createOrderItem(Item item, int count){
         OrderItem orderItem = new OrderItem();
@@ -32,7 +32,7 @@ public class OrderItem extends BaseEntity {
     } // 주문할 상품의 정보를 담은 객체 생성
 
     public int getTotalPrice(){
-        return orderPrice * count; // 아이템 단가와 주문 수량을 곱한 총액 반환
+        return orderPrice ; // 아이템 단가와 주문 수량을 곱한 총액 반환
     }
 }
 

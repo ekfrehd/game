@@ -6,6 +6,7 @@ import com.no3.game.entity.Order;
 import com.no3.game.entity.Review;
 import com.no3.game.repository.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
@@ -19,11 +20,14 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.security.Principal;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
 @Transactional // 로직을 처리하다 에러가 발생하면 변경된 데이터를 로직을 수행하기 이전 상태로 콜백 시켜줌
 @RequiredArgsConstructor
+@Log4j2
 public class MemberService implements UserDetailsService {
     private final MemberRepository memberRepository;
     private final CartRepository cartRepository;
@@ -76,9 +80,36 @@ public class MemberService implements UserDetailsService {
             // - 이 토큰은 인증된 사용자의 세부 정보를 포함하게 됩니다.
             OAuth2User oauth2User = ((OAuth2AuthenticationToken) principal).getPrincipal();
             // 인증된 사용자의 세부 정보(예: 이름, 이메일, 프로필 사진 등)를 담고 있는 'OAuth2User' 객체를 가져옵니다.
-            String email = oauth2User.getAttribute("email");
+            log.info("OAuth2User details: {}", oauth2User);
+            String id = null;
+            Object idAttribute = oauth2User.getAttribute("id");
+            if (idAttribute != null) {
+                id = idAttribute.toString();
+            } else {
+                Object subAttribute = oauth2User.getAttribute("sub");
+                if (subAttribute != null) {
+                    id = subAttribute.toString();
+                } else {
+                    Map<String, Object> responseAttributes = (Map<String, Object>) oauth2User.getAttribute("response");
+                    if (responseAttributes != null) {
+                        Object responseIdAttribute = responseAttributes.get("id");
+                        if (responseIdAttribute != null) {
+                            id = responseIdAttribute.toString();
+                        }
+                    }
+                }
+            }
             // 'OAuth2User' 객체에서 이메일 주소를 추출합니다. 이는 소셜 로그인 제공자가 제공하는 정보 중 하나입니다.
-            return memberRepository.findByEmail(email).orElse(null);
+            log.info("Using OAuth2AuthenticationToken, id: {}", id);
+
+
+
+            Member member = memberRepository.findByProviderId(id);
+
+            // 로그 추가
+
+
+            return member;
             // 해당 이메일로 'Member' 객체를 데이터베이스에서 찾아 반환합니다.
 
         } else {
@@ -88,31 +119,36 @@ public class MemberService implements UserDetailsService {
     }
     public boolean deleteMember(String email, String password) {
         // 회원 탈퇴
-
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("이메일이 존재하지 않습니다."));
 
-        Long cartId;
+        // Find the cart associated with the member
         Cart cart = cartRepository.findByMemberId(member.getId());
 
         if (cart != null) {
-            cartId = cart.getId();
-            cartItemRepository.deleteByCartId(cartId);
-            cartRepository.deleteCartById(cartId);
+            // Delete cart items by cart ID
+            cartItemRepository.deleteByCartId(cart.getId());
+            // Delete the cart itself
+            cartRepository.delete(cart);
         }
 
-        // Remove the member from orders
-        Order order = orderRepository.findByMemberId(member.getId());
+        // Find orders for the member
+        List<Order> orders = orderRepository.findByMemberId(member.getId());
 
-        if (order != null) {
-            order.setMember(null);
+        if (!orders.isEmpty()) {
+            // Process the orders, remove the member from each order
+            for (Order order : orders) {
+                order.setMember(null);
+                orderRepository.save(order);
+            }
         }
 
-        // Delete review by member
-        Review review = reviewRepository.findByMemberId(member.getId());
+        // Find reviews by the member
+        List<Review> reviews = reviewRepository.findByMemberId(member.getId());
 
-        if (review != null) {
-            reviewRepository.deleteReviewByMember(member);
+        if (!reviews.isEmpty()) {
+            // Delete reviews by member
+            reviewRepository.deleteByMember(member);
         }
 
         // Check the password and delete the member

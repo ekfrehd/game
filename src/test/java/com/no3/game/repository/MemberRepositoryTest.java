@@ -27,12 +27,12 @@ public class MemberRepositoryTest {
     @Test
     public void insertMembers() {
 
-        IntStream.rangeClosed(1,5).forEach(i -> {
+        IntStream.rangeClosed(1,50).forEach(i -> {
             Member member = Member.builder()
                     .email("aa"+i+5 +"@naver.com")
                     .password(passwordEncoder.encode("12341234"))
                     .name("test"+i)
-                    .role(Role.ADMIN)
+                    .role(Role.USER)
                     .build();
             memberRepository.save(member);
         }); // USER insert test

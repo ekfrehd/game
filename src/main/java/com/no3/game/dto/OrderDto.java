@@ -14,4 +14,6 @@ public class OrderDto {
 
     private int count;
 
+    private int totalPrice;
+
 }
